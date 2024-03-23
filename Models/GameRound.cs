@@ -11,6 +11,7 @@ namespace MathGame.Models
         public string RoomName { get; set; }
         public int RoundNumber { get; set; }
         public string Expression { get; set; }
+        public bool IsCorrect { get; set; }
         public int FirstCorrectAnswerTimestamp { get; set; }
         public string Username { get; set; }
 
