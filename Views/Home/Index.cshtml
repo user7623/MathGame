@@ -1,0 +1,20 @@
+﻿@model MathGame.Models.Player
+@{
+    ViewData["Title"] = "Lobby";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to the quick math game Lobby</h1>
+    @*do i need player name?*@
+    @*TODO : remove class and inputs if not used*@
+    
+<form asp-controller="Home" asp-action="JoinGame" method="post">
+    <label asp-for="PlayerName">Please enter a player name</label>
+    <input asp-for="PlayerName" type="text" />
+
+    <!-- Include hidden inputs for each property of the model you want to send -->
+    <input type="hidden" asp-for="Score" />
+    <!-- Add additional hidden inputs for other properties as needed -->
+    <button type="submit" class="btn btn-primary">Join game</button>
+</form>
+</div>

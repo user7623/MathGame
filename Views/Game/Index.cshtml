@@ -1,0 +1,75 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@*TODO : change n with actual dynamic room number or name, whatever*@
+
+<link href="//cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<h1> Welcome to game room number n</h1>
+
+<div id="main-wrapper" class="wrapper">
+    <div class="row col-12 text-center p-2 m-2">
+        <p>Your score is 'player score'.</p>
+        <p>There are 'users online' users currently online</p>
+    </div>
+    <div class="col col-12 p-2">
+        @*Tabelata tuka*@
+        <div class="container">
+            <div class="table-responsive">
+                <table id="questionsTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Expression</th>
+                            <th>You Answer</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        @*tuka delot za dodavanje ili slicno*@
+    </div>
+</div>
+
+@*TODO : score, active players, table etc*@
+
+
+@section Scripts{
+    <script src="//cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#questionsTable').DataTable({
+                ajax: {
+                    url: "Game/GetQuestionsTable",
+                    type: "POST",
+                    dataSrc: function (response) {
+                        console.log(response);
+                        debugger;
+
+                        // Check the contents of the response here
+                        if (response.someCondition) {
+                            // Modify the response data or handle it as needed
+                            return response.data;
+                        } else {
+                            // Handle the response differently if needed
+                            return []; // Return an empty array or other suitable value
+                        }
+                    }
+                },
+                serverSide: true,
+                columns: [
+                    { data: "#", name: "#" },
+                    { data: "Expression", name: "Expression" },
+                    { data: "YourAnswer", name: "YourAnswer" },
+                    { data: "Result", name: "Result" },
+                ]
+            });
+        });
+    </script>
+
+    <script src="~/js/site.js"></script>
+}
