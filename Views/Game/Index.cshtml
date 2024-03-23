@@ -22,7 +22,7 @@
                 <table id="questionsTable" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>RoundNumber</th>
                             <th>Expression</th>
                             <th>You Answer</th>
                             <th>Result</th>
@@ -40,36 +40,5 @@
 
 @section Scripts{
     <script src="//cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#questionsTable').DataTable({
-                ajax: {
-                    url: "Game/GetQuestionsTable",
-                    type: "POST",
-                    dataSrc: function (response) {
-                        console.log(response);
-                        debugger;
-
-                        // Check the contents of the response here
-                        if (response.someCondition) {
-                            // Modify the response data or handle it as needed
-                            return response.data;
-                        } else {
-                            // Handle the response differently if needed
-                            return []; // Return an empty array or other suitable value
-                        }
-                    }
-                },
-                serverSide: true,
-                columns: [
-                    { data: "#", name: "#" },
-                    { data: "Expression", name: "Expression" },
-                    { data: "YourAnswer", name: "YourAnswer" },
-                    { data: "Result", name: "Result" },
-                ]
-            });
-        });
-    </script>
-
-    <script src="~/js/site.js"></script>
+    <script src="~/js/gameRoom.js"></script>
 }

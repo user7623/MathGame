@@ -11,10 +11,10 @@ namespace MathGame.Models
         public string RoomName { get; set; }
         public int RoundNumber { get; set; }
         public string Expression { get; set; }
-        DateTime FirstCorrectAnswerTimestamp { get; set; }
+        public int FirstCorrectAnswerTimestamp { get; set; }
         public string Username { get; set; }
 
-        public GameRound(int Id, string RoomName, int RoundNumber, string Expression, DateTime FirstCorrectAnswerTimestamp, string Username)
+        public GameRound(int Id, string RoomName, int RoundNumber, string Expression, int FirstCorrectAnswerTimestamp, string Username)
         {
             this.Id = Id;
             this.RoomName = RoomName;
@@ -23,5 +23,7 @@ namespace MathGame.Models
             this.FirstCorrectAnswerTimestamp = FirstCorrectAnswerTimestamp;
             this.Username = Username;
         }
+
+        public GameRound() { }
     }
 }

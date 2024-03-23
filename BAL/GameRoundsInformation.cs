@@ -1,6 +1,9 @@
 ﻿using MathGame.BAL.Interfaces;
+using MathGame.Dtos;
 using MathGame.Models;
 using MathGame.Repositories.Interfaces;
+using Serilog;
+using System;
 using System.Collections.Generic;
 
 namespace MathGame.BAL
@@ -14,6 +17,11 @@ namespace MathGame.BAL
             _repository = repository;
         }
 
+        public GameRound GetGameRoundById(int roundNumber, string roomName)
+        {
+            return _repository.GetGameRoundById(roundNumber, roomName);
+        }
+
         public List<GameRound> ReadRoundsForRoom(string roomName)
         {
             if (string.IsNullOrEmpty(roomName))
@@ -24,9 +32,56 @@ namespace MathGame.BAL
             return _repository.ReadRoundsForRoom(roomName);
         }
 
-        public bool SaveGameRound(GameRound newRound)
+        public void SaveAnswerForRound(AnswerDto answer)
         {
-            return _repository.SaveGameRound(newRound);
+            try
+            {
+                var gameRound = _repository.GetGameRoundById(answer.RoundNumber, answer.RoomName);
+
+                if (gameRound != null)
+                {
+                    if (gameRound.FirstCorrectAnswerTimestamp > answer.Timestamp
+                        || string.IsNullOrEmpty(gameRound.FirstCorrectAnswerTimestamp.ToString()))
+                    {
+                        gameRound.FirstCorrectAnswerTimestamp = answer.Timestamp;
+                        gameRound.Username = "rd frm cll prmtr";
+                        _repository.UpdateGameRound(gameRound);
+                    }
+                }
+
+                _repository.SaveAnswerForRound(answer);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameRoundsInformation -> SaveAnswerForRound");
+                Log.Error(ex.ToString());
+            }
+        }
+
+        public void SaveGameRound(GameRound newRound)
+        {
+            try
+            {
+                _repository.SaveGameRound(newRound);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameRoundsInformation -> SaveGameRound");
+                Log.Error(ex.ToString());
+            }
+        }
+
+        public void UpdateGameRound(GameRound newRound)
+        {
+            try
+            {
+                _repository.UpdateGameRound(newRound);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameRoundsInformation -> UpdateGameRound");
+                Log.Error(ex.ToString());
+            }
         }
     }
 }

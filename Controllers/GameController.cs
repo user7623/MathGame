@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MathGame.BAL.Interfaces;
+using MathGame.Dtos;
+using MathGame.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
 
@@ -9,6 +14,13 @@ namespace MathGame.Controllers
 {
     public class GameController : Controller
     {
+        private readonly IGameRoundsInformation _gameRoundsInformation;
+
+        public GameController(IGameRoundsInformation gameRoundsInformation)
+        {
+            _gameRoundsInformation = gameRoundsInformation;
+        }
+
         public IActionResult Index()
         {
             int activeSessionsCount = HttpContext.Session.Keys.Count();
@@ -19,23 +31,37 @@ namespace MathGame.Controllers
             return View();
         }
         [HttpPost]
-        public string GetQuestionsTable()
+        public List<GameRound> GetQuestionsTable()
         {
-            string jsonData = @"[
-                                    { ""#"": 1, ""Expression"": ""2 + 2"", ""YourAnswer"": 4, ""Result"": ""Correct"" },
-                                    { ""#"": 2, ""Expression"": ""5 * 3"", ""YourAnswer"": 15, ""Result"": ""Correct"" }
-                                ]";
 
-            var res = new JsonResult(jsonData);
+            var response = new List<GameRound>();
 
-            var response = JsonConvert.SerializeObject(jsonData);
-
-            //JsonResult result = new JsonResult
-            //{
-            //    Data = JsonConvert.DeserializeObject(jsonData)
-            //};
+            GameRound roundOne = new GameRound(1,"BlueRoom", 1, "2 + 2", (int)DateTime.Now.Ticks, "Filip");
+            GameRound roundTwo = new GameRound(2, "BlueRoom", 2, "2 + 4", (int)DateTime.Now.Ticks, "Filip");
+            response.Add(roundOne);
+            response.Add(roundTwo);
 
             return response;
+        }
+
+        [HttpPost]
+        public IActionResult SubmitAnswer([FromBody] AnswerDto answer)
+        {
+            var temp = answer;
+
+            var a = answer.Answer;
+
+            try
+            {
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+            //TODO : save answer
+
+            return Ok();
         }
     }
 }
