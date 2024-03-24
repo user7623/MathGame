@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OnlineUsers;
 using MathGame.Repositories.Interfaces;
+using MathGame.MathExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace MathGame
 {
@@ -34,6 +36,12 @@ namespace MathGame
 
             services.AddScoped<IGameRoundsInformation, GameRoundsInformation>();
             services.AddScoped<IGameRoundsRepository, GameRoundsRepository>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddSignalR();
+
+            //services.AddScoped<IRoomExpressionGeneratorScheduler, RoomExpressionGeneratorScheduler>();
 
             services.AddDbContext<MathGameDbContext>(
                 options => options.UseSqlServer("name=ConnectionStrings:gameDbConnectionString"));

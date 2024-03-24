@@ -12,7 +12,7 @@ namespace MathGame.Models
         public int RoundNumber { get; set; }
         public string Expression { get; set; }
         public bool IsCorrect { get; set; }
-        public int FirstCorrectAnswerTimestamp { get; set; }
+        public long FirstCorrectAnswerTimestamp { get; set; }
         public string Username { get; set; }
 
         public GameRound(int Id, string RoomName, int RoundNumber, string Expression, int FirstCorrectAnswerTimestamp, string Username)

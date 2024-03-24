@@ -1,14 +1,14 @@
 ﻿using MathGame.BAL.Interfaces;
 using MathGame.Dtos;
 using MathGame.Models;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Transports;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
 
 namespace MathGame.Controllers
 {
@@ -35,11 +35,8 @@ namespace MathGame.Controllers
         {
 
             var response = new List<GameRound>();
-
-            GameRound roundOne = new GameRound(1,"BlueRoom", 1, "2 + 2", (int)DateTime.Now.Ticks, "Filip");
-            GameRound roundTwo = new GameRound(2, "BlueRoom", 2, "2 + 4", (int)DateTime.Now.Ticks, "Filip");
-            response.Add(roundOne);
-            response.Add(roundTwo);
+            var roomName = "test room";//TODO
+            response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
 
             return response;
         }
@@ -63,5 +60,51 @@ namespace MathGame.Controllers
 
             return Ok();
         }
+
+        #region forTestingDeleteWhenDone
+
+        public int GetOnlineCount()
+        {
+            return 1;
+        }
+
+        public void TestForSavingAndReadingGameRounds()
+        {
+            try
+            {
+                GameRound testGameRound = new GameRound
+                {
+                    Expression = "2+1=3",
+                    FirstCorrectAnswerTimestamp = 11111111,
+                    Username = "FILIPUIS",
+                    RoomName = "test room",
+                    RoundNumber = 11
+                };
+
+                _gameRoundsInformation.SaveGameRound(testGameRound);
+            } catch(Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+        }
+        public void TestReadGameRound()
+        {
+            var testRound = new List<GameRound>();
+
+            testRound = _gameRoundsInformation.ReadRoundsForRoom("blueRoom");
+            testRound.AddRange(_gameRoundsInformation.ReadRoundsForRoom("test room"));
+
+            testRound = testRound;
+        }
+
+        public void TestUpdateGameRound()
+        {
+            var testRound = _gameRoundsInformation.ReadRoundsForRoom("test room");
+            testRound.FirstOrDefault().FirstCorrectAnswerTimestamp = DateTime.Now.Ticks;
+            testRound.FirstOrDefault().Username = "F ILI P";
+            _gameRoundsInformation.UpdateGameRound(testRound.FirstOrDefault());
+        }
+
+        #endregion
     }
 }

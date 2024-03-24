@@ -1,7 +1,9 @@
 ﻿using MathGame.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using OnlineUsers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,10 +15,12 @@ namespace MathGame.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHubContext<OnlineUsersHub> _onlineUsersHubContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHubContext<OnlineUsersHub> onlineUsersHubContext)
         {
             _logger = logger;
+            _onlineUsersHubContext = onlineUsersHubContext;
         }
 
         public IActionResult Index()
@@ -46,6 +50,16 @@ namespace MathGame.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult GetActive()
+        {
+            int onlineUsersCount = OnlineUsersHub.GetOnlineUsersCount();
+            //TODO : remove comment
+            // Alternatively, you can use the hub context to call methods on the hub
+            //await _onlineUsersHubContext.Clients.All.SendAsync("UpdateOnlineUsers", onlineUsersCount);
+
+            return Ok(onlineUsersCount);
         }
     }
 }

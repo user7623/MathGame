@@ -27,6 +27,9 @@ function LoadGameData() {
             }
         },
         serverSide: true,
+        paginate: false,
+        filter: false,
+        info: false,
         columns: [
             { data: "roundNumber", name: "roundNumber" },
             { data: "expression", name: "expression" },

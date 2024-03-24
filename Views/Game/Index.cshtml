@@ -9,7 +9,9 @@
 <link href="//cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet" />
 
 <h1> Welcome to game room number n</h1>
-
+<span class="nav-link text-dark font-weight-bold">
+    Online Users (with SignalR) : <span id="onlineUsersCount"></span>
+</span>
 <div id="main-wrapper" class="wrapper">
     <div class="row col-12 text-center p-2 m-2">
         <p>Your score is 'player score'.</p>
@@ -39,6 +41,18 @@
 
 
 @section Scripts{
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    @*TODO : move ti deducated file*@
+    <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/onlineUsersHub").build();
+
+        connection.on("UpdateOnlineUsers", function (count) {
+            document.getElementById("onlineUsersCount").innerText = count;
+        });
+
+        connection.start();
+    </script>
     <script src="//cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="~/js/gameRoom.js"></script>
 }
