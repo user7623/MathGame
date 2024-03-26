@@ -1,6 +1,76 @@
 ﻿$(document).ready(function () {
     LoadGameData();
+    setInterval(InitializeNewRoundTimer, 50000);
+    //StartRoundTimer
+    //GetLastUnansweredRound
+    //BuildRowWithButtonsFromUnansweredRound
 });
+//WORKFLOW
+//You enter, the game up to now gets loaded - done
+//timer get initialized
+//newest round gets loaded with buttons for answering
+
+function InitializeNewRoundTimer() {
+    const url = "https://localhost:44386/Game/GetNewestRound?roomName=" + "test room";//${ roomName };
+
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function (data) {
+            // Process the received data
+            //tuka treba da se izgradi redot za input
+            AddRowForAnswering(data);
+        },
+        error: function (xhr, status, error) {
+            console.error('There was a problem with the AJAX request:', error);
+        }
+    });
+}
+
+function AddRowForAnswering(data) {
+    debugger;
+    var rowHTML = `
+    <tr class="even">
+        <td>` + data.roundNumber + `</td>
+        <td>` + data.expression + `</td>
+        <td>
+            <button onclick="javascript: SubmitAnswer(` + data.roundNumber + `, Yes)">Yes</button>
+            <button onclick="javascript: SubmitAnswer(` + data.roundNumber + `, No)">No</button>
+        </td>
+        <td></td>
+    </tr>
+`;
+
+    $('#questionsTable').DataTable().row.add($(rowHTML)).draw();
+}
+
+function AnsweredYes() {
+    const url = "https://localhost:44386/Game/SubmitAnswer?roomName=" + "test room";//${ roomName };
+    var obj = {
+        answer: 'yes',
+        roundNumber: 1,
+        roomName: "test room",
+        timestamp: Date.now()
+    }
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        object: JSON.stringify(obj),
+        success: function (data) {
+            // Process the received data
+            //tuka treba da se izgradi redot za input
+            AddRowForAnswering(data);
+        },
+        error: function (xhr, status, error) {
+            console.error('There was a problem with the AJAX request:', error);
+        }
+    });
+}
+
+function AnsweredNo() {
+
+}
 
 function LoadGameData() {
     $('#questionsTable').DataTable({
@@ -43,18 +113,14 @@ function BuildInitialTable() {
     //TODO : here build the initial table
 }
 
-function RefreshGameTable() {
-
-}
-
-function SubmitAnswer() {
+function SubmitAnswer(roundNumber, answer) {
     //TODO : read values from input fileds
     var data = {
-        Answer: "Yes",
-        RoundNumber: 1,
-        RoomName: "Blue room",
+        Answer: answer,
+        RoundNumber: roundNumber,
         Timestamp: Date.now(),
     };
+    debugger;
     $.ajax({
         type: "POST",
         url: "Game/SubmitAnswer",

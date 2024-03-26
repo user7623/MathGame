@@ -5,6 +5,7 @@ using MathGame.Repositories.Interfaces;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MathGame.BAL
 {
@@ -20,6 +21,16 @@ namespace MathGame.BAL
         public GameRound GetGameRoundById(int roundNumber, string roomName)
         {
             return _repository.GetGameRoundById(roundNumber, roomName);
+        }
+
+        public int GetLastRoundNumber(string roomName)
+        {
+            return _repository.GetLastRoundNumber(roomName);
+        }
+
+        public GameRound GetNewestRound(string roomName)
+        {
+            return _repository.GetNewestRound(roomName);
         }
 
         public List<GameRound> ReadRoundsForRoom(string roomName)
@@ -58,11 +69,11 @@ namespace MathGame.BAL
             }
         }
 
-        public void SaveGameRound(GameRound newRound)
+        public async Task SaveGameRound(GameRound newRound)
         {
             try
             {
-                _repository.SaveGameRound(newRound);
+                 await _repository.SaveGameRound(newRound);
             }
             catch (Exception ex)
             {

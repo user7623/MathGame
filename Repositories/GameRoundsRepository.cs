@@ -6,6 +6,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MathGame.Repositories
 {
@@ -18,12 +19,12 @@ namespace MathGame.Repositories
             _context = context;
         }
 
-        public void SaveGameRound(GameRound newRound)
+        public async Task SaveGameRound(GameRound newRound)
         {
             try
             {
-                _context.Instance.GameRounds.Add(newRound);
-                _context.Instance.SaveChanges();
+                 await _context.Instance.GameRounds.AddAsync(newRound);
+                 await _context.Instance.SaveChangesAsync();
             }
             catch(Exception ex)
             {
@@ -90,6 +91,40 @@ namespace MathGame.Repositories
             {
                 Log.Error("Exception in GameRoundsInformation -> SaveAnswerForRound");
                 Log.Error(ex.ToString());
+            }
+        }
+
+        public int GetLastRoundNumber(string roomName)
+        {
+            try
+            {
+                var rounds = _context.Instance.GameRounds.Where(r => r.RoomName.Equals(roomName)).ToList();
+
+                if (rounds.Count == 0) return 0;//First round
+
+                return rounds.OrderByDescending(r => r.RoundNumber)
+                             .Select(r => r.RoundNumber)
+                             .FirstOrDefault();
+            }
+            catch(Exception ex)
+            {
+                Log.Error("Exception in GameRoundsInformation -> GetLastRoundNumber");
+                Log.Error(ex.ToString());
+                return 1;
+            }
+        }
+
+        public GameRound GetNewestRound(string roomName)
+        {
+            try
+            {
+                return _context.Instance.GameRounds.OrderByDescending(r => r.RoundNumber).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameRoundsInformation -> GetNewestRound");
+                Log.Error(ex.ToString());
+                return null;
             }
         }
     }

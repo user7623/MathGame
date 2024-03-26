@@ -1,4 +1,5 @@
-﻿using MathGame.Models;
+﻿using MathGame.BAL.Interfaces;
+using MathGame.Models;
 using System;
 
 namespace MathGame.MathExpressions
@@ -11,7 +12,7 @@ namespace MathGame.MathExpressions
         /// </summary>
         /// <param name="roundNumber"></param>
         /// <param name="roomName"></param>
-        public void GenerateMathExpression(int roundNumber, string roomName)
+        public GameRound GenerateMathExpression(int roundNumber, string roomName)
         {
             var randomInteger = new Random();
             char[] operations = { '*', '/', '+', '-' };
@@ -41,11 +42,13 @@ namespace MathGame.MathExpressions
 
             GameRound newGameRound = new GameRound();
             newGameRound.IsCorrect = isCorrect;
-            newGameRound.RoundNumber = roundNumber;
+            newGameRound.RoundNumber = roundNumber+1;
             newGameRound.Expression = expression;
             newGameRound.Username = string.Empty;
-            newGameRound.FirstCorrectAnswerTimestamp = (int)futureTimestamp.Ticks;
+            newGameRound.FirstCorrectAnswerTimestamp = futureTimestamp.Ticks;
             newGameRound.RoomName = roomName;
+
+            return newGameRound;
         }
 
         private int CalculateResult(int firstOperand, int secondOperand, char operationSymbol)
