@@ -80,9 +80,9 @@ namespace MathGame.Controllers
             {
                 //TODO : get only the last five or so
                 var response = new List<GameRound>();
-                var roomName = "test room";//TODO
+                var roomName = "test room";//TODO read from session
                 response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
-
+                response.RemoveAt(response.Count - 1);
                 return response;
             }
             catch (Exception ex)
