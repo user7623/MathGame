@@ -1,6 +1,4 @@
-﻿var roundCounter = 0;
-
-$(document).ready(function () {
+﻿$(document).ready(function () {
     FetchGameData();
     setInterval(InitializeNewRoundTimer, 5000);
     //StartRoundTimer
@@ -12,7 +10,11 @@ $(document).ready(function () {
 //timer get initialized
 //newest round gets loaded with buttons for answering
 
+
+//TODO : last, need to redraw table
+
 function InitializeNewRoundTimer() {
+    //tuka treba da se refreshira databazata/ da se povika od novo za da se vcitaat 
     console.log("initialize");
     GetResultFromCurrentRound();
 
@@ -23,6 +25,7 @@ function InitializeNewRoundTimer() {
         method: 'GET',
         success: function (data) {
             AddRowForAnswering(data);
+            //table.row.add(rowData).draw(false);
         },
         error: function (xhr, status, error) {
             console.error('There was a problem with the AJAX request:', error);
@@ -34,10 +37,9 @@ function GetResultFromCurrentRound() {
     console.log("GetResultFromCurrentRound");
     debugger;
     var table = $('#questionsTable').DataTable();
-    var lastRowIndex = table.rows().count() + roundCounter - 1;
+    var lastRowIndex = table.rows().count() - 1;
     var newCellValue = 'new value';//TODO
     table.cell(lastRowIndex, -1).data(newCellValue);
-    roundCounter++;
 }
 
 function FetchGameData() {
@@ -85,40 +87,13 @@ function FetchGameData() {
     });
 }
 
-//function AddRowForAnswering(data) {
-//    // Get reference to the DataTable
-//    var table = $('#questionsTable').DataTable();
-
-//    // Add new row data to DataTable's internal data array
-//    var newRowData = [
-//        data.roundNumber,
-//        data.expression,
-//        '<button class="answer-button" data-round-number="' + data.roundNumber + '">Yes</button>' +
-//        '<button class="answer-button" data-round-number="' + data.roundNumber + '">No</button>',
-//        ''
-//    ];
-//    table.row.add(newRowData);
-
-//    //$('.answer-button').on('click', function () {
-//    //    var roundNumber = $(this).data('round-number');
-//    //    var answer = $(this).text();
-//    //    SubmitAnswer(roundNumber, answer);
-//    //});
-//}
-
 function AddRowForAnswering(data) {
-    var rowHTML = `<tr class="even">
-                        <td>` + data.roundNumber + `</td>
-                        <td>` + data.expression + `</td>
-                        <td>
-                            <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber + `, Yes)">Yes</button>
-                            <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber + `, No)">No</button>
-                        </td>
-                        <td></td>
-                    </tr>`;
+    var buttonsForAnsweringHtml = ` <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber + `, 'Yes')">Yes</button>
+                                    <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber + `, 'No')">No</button>`;
 
-    const tableBody = $('#questionsTable tbody');
-    tableBody.append(rowHTML);
+    var table = $('#questionsTable').DataTable();
+    var lastRowIndex = table.rows().count() - 1;
+    table.cell(lastRowIndex, -2).data(buttonsForAnsweringHtml);
 
         $('.answer-button').on('click', function () {
         var roundNumber = $(this).data('round-number');
@@ -175,31 +150,35 @@ function SubmitAnswer(roundNumber, answer) {
 
     SetYourAnswerCellText(answer);
 
-    //var data = {
-    //    Answer: answer,
-    //    RoundNumber: roundNumber,
-    //    Timestamp: Date.now(),
-    //};
-    //debugger;
-    //$.ajax({
-    //    type: "POST",
-    //    url: "Game/SubmitAnswer",
-    //    contentType: "application/json",
-    //    data: JSON.stringify(data),
-    //    success: function (data, status) {
-    //        alert("Data: " + data + "\nStatus: " + status);
-    //    },
-    //    error: function (xhr, status, error) {
-    //        alert("Error: " + error);
-    //    }
-    //});
+    //TODO : round number is 0 here, fix
+
+    var data = {
+        Answer: answer,
+        RoundNumber: roundNumber,
+        Timestamp: Date.now(),
+        RoomName: "test room",
+    };
+    debugger;
+    //TODO : roomname is null
+    $.ajax({
+        type: "POST",
+        url: "Game/SubmitAnswer",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function (data, status) {
+            alert("Data: " + data + "\nStatus: " + status);
+        },
+        error: function (xhr, status, error) {
+            alert("Error: " + error);
+        }
+    });
 }
 
 function SetYourAnswerCellText(answer) {
     debugger;
     //get the result from current round
     var table = $('#questionsTable').DataTable();
-    var lastRowIndex = table.rows().count() + roundCounter - 2;
+    var lastRowIndex = table.rows().count() - 1;
     var newCellValue = answer;
-    table.cell(lastRowIndex, -1).data(newCellValue);
+    table.cell(lastRowIndex, -2).data(newCellValue);
 }

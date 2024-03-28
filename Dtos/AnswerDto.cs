@@ -8,6 +8,6 @@ namespace MathGame.Dtos
         public int RoundNumber { get; set; }
         public string RoomName { get; set; }
         public long Timestamp { get; set; }
-        public string Username { get; set; }
+        public string? Username { get; set; }
     }
 }

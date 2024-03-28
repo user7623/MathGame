@@ -87,14 +87,12 @@ namespace MathGame.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost]
         public IActionResult SubmitAnswer([FromBody] AnswerDto answer)
         {
             if (!string.IsNullOrEmpty(answer.Answer) && !string.IsNullOrEmpty(answer.RoomName))
             {
-                answer.Username = HttpContext.Session.GetString("PlayerName");
-                answer.RoomName = HttpContext.Session.GetString("RoomName");
+                answer.Username = HttpContext.Session.GetString("PlayerName");//TODO : is this needed
                 try
                 {
                     _gameRoundsInformation.SaveAnswerForRound(answer);

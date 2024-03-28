@@ -49,15 +49,12 @@ namespace MathGame.BAL
             {
                 var gameRound = _repository.GetGameRoundById(answer.RoundNumber, answer.RoomName);
 
-                if (gameRound != null)
+                if (gameRound.FirstCorrectAnswerTimestamp > answer.Timestamp
+                    || string.IsNullOrEmpty(gameRound.FirstCorrectAnswerTimestamp.ToString()))
                 {
-                    if (gameRound.FirstCorrectAnswerTimestamp > answer.Timestamp
-                        || string.IsNullOrEmpty(gameRound.FirstCorrectAnswerTimestamp.ToString()))
-                    {
-                        gameRound.FirstCorrectAnswerTimestamp = answer.Timestamp;
-                        gameRound.Username = "rd frm cll prmtr";
-                        _repository.UpdateGameRound(gameRound);
-                    }
+                    gameRound.FirstCorrectAnswerTimestamp = answer.Timestamp;
+                    gameRound.Username = answer.Username;
+                    _repository.UpdateGameRound(gameRound);
                 }
 
                 _repository.SaveAnswerForRound(answer);
@@ -73,7 +70,7 @@ namespace MathGame.BAL
         {
             try
             {
-                 await _repository.SaveGameRound(newRound);
+                await _repository.SaveGameRound(newRound);
             }
             catch (Exception ex)
             {
