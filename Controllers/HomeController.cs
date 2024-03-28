@@ -25,6 +25,15 @@ namespace MathGame.Controllers
 
         public IActionResult Index()
         {
+            var userToken = HttpContext.Session.GetString("token");
+
+            if(string.IsNullOrEmpty(userToken) || !UserHasValidToken(userToken)) return RedirectToAction("Login", "Home");
+
+            return View();      
+        }
+
+        public IActionResult Login()
+        {
             return View();
         }
 
@@ -60,6 +69,16 @@ namespace MathGame.Controllers
             //await _onlineUsersHubContext.Clients.All.SendAsync("UpdateOnlineUsers", onlineUsersCount);
 
             return Ok(onlineUsersCount);
+        }
+
+        private bool UserHasValidToken(string token)
+        {
+            //For simplicity and in the interest of time im not implementing actial tokes in this case
+            if (token.Equals("token"))
+            {
+                return true;
+            }
+            else return false;
         }
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using OnlineUsers;
 using MathGame.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace MathGame
 {
@@ -42,6 +43,17 @@ namespace MathGame
 
             services.AddDbContext<MathGameDbContext>(
                 options => options.UseSqlServer("name=ConnectionStrings:gameDbConnectionString"));
+
+            services.AddIdentity<IdentityUser, IdentityRole>(
+                opt => {
+                    opt.Password.RequireDigit = false;
+                    opt.Password.RequireLowercase = false;
+                    opt.Password.RequireUppercase = false;
+                    opt.Password.RequireNonAlphanumeric = false;
+                    opt.Password.RequiredLength = 2;
+
+                    opt.User.RequireUniqueEmail = true;
+                }).AddEntityFrameworkStores<MathGameDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +77,7 @@ namespace MathGame
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseSession();

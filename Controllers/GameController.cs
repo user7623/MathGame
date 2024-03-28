@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using Serilog;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MathGame.Controllers
 {
@@ -29,12 +30,6 @@ namespace MathGame.Controllers
 
         public async Task<IActionResult> Index()
         {
-            int activeSessionsCount = HttpContext.Session.Keys.Count();
-
-            //not sure this is needed any longer
-            var playerName = HttpContext.Session.GetString("PlayerName");
-            var roomName = HttpContext.Session.GetString("RoomName");
-
             return View();
         }
 
@@ -82,7 +77,6 @@ namespace MathGame.Controllers
                 var response = new List<GameRound>();
                 var roomName = "test room";//TODO read from session
                 response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
-                response.RemoveAt(response.Count - 1);
                 return response;
             }
             catch (Exception ex)
@@ -93,6 +87,7 @@ namespace MathGame.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult SubmitAnswer([FromBody] AnswerDto answer)
         {

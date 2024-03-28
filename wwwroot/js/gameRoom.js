@@ -2,7 +2,7 @@
 
 $(document).ready(function () {
     FetchGameData();
-    setInterval(InitializeNewRoundTimer, 5000000);
+    setInterval(InitializeNewRoundTimer, 5000);
     //StartRoundTimer
     //GetLastUnansweredRound
     //BuildRowWithButtonsFromUnansweredRound
@@ -46,6 +46,7 @@ function FetchGameData() {
             url: "Game/GetQuestionsTable",
             type: "POST",
             dataSrc: function (response) {
+                debugger;
                 if (response != null && response != undefined) {
                     return response.map(function (item) {
                         return {
