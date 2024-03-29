@@ -12,6 +12,9 @@ using OnlineUsers;
 using MathGame.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using MathGame.Controllers;
+using MathGame.Services.Interfaces;
+using MathGame.Services;
 
 namespace MathGame
 {
@@ -34,11 +37,15 @@ namespace MathGame
 
             services.AddTransient<IContext, Context>();
 
+            services.AddScoped<IActivePlayersService, ActivePlayersService>();
+            services.AddHttpClient<ActivePlayersService>();
             services.AddScoped<IGameRoundsInformation, GameRoundsInformation>();
             services.AddScoped<IGameRoundsRepository, GameRoundsRepository>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSignalR();
+
+
             //services.AddScoped<IRoomExpressionGeneratorScheduler, RoomExpressionGeneratorScheduler>();
 
             services.AddDbContext<MathGameDbContext>(

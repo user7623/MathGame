@@ -87,6 +87,28 @@ namespace MathGame.Controllers
             }
         }
 
+        //GetQuestionsTableAfterRound
+        [HttpPost]
+        public List<GameRound> GetQuestionsTableAfterRound(int roundNumber)
+        {
+            try
+            {
+                //TODO : get only the last five or so
+                var response = new List<GameRound>();
+                var roomName = "test room";//TODO read from session
+                response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameController -> GetQuestionsTable");
+                Log.Error(ex.ToString());
+                return null;
+            }
+        }
+
+
+
         [HttpPost]
         public IActionResult SubmitAnswer([FromBody] AnswerDto answer)
         {

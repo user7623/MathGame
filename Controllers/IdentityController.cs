@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Threading.Tasks;
 using MathGame.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -53,7 +49,7 @@ namespace MathGame.Controllers
 
 			HttpContext.Session.SetString("token", "token");
 			HttpContext.Session.SetString("PlayerName", userFromDb.UserName);
-			return RedirectToAction("Index", "Game");
+			return RedirectToAction("Index", "Home");
         }
 
 		[HttpPost("register")]

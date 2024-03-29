@@ -36,17 +36,18 @@ namespace MathGame.MathExpressions
             //we decide who answered first based on the timestamp of the answer
             //instead of saving null as default value before answer is given by user
             //we save a timestamp that is in the future so when the user's answer 
-            //arrives it will be "first" and get saved along with a real value for username
-            var futureTimestamp = DateTime.Now;
-            futureTimestamp.AddDays(1);
+            //arrives it will be "first" and get saved along with a real value for username        
+            var futureTimestamp = DateTimeOffset.Now.AddDays(1).ToUnixTimeMilliseconds();
 
-            GameRound newGameRound = new GameRound();
-            newGameRound.IsCorrect = isCorrect;
-            newGameRound.RoundNumber = roundNumber+1;
-            newGameRound.Expression = expression;
-            newGameRound.Username = string.Empty;
-            newGameRound.FirstCorrectAnswerTimestamp = futureTimestamp.Ticks;
-            newGameRound.RoomName = roomName;
+            GameRound newGameRound = new GameRound
+            {
+                IsCorrect = isCorrect,
+                RoundNumber = roundNumber + 1,
+                Expression = expression,
+                Username = string.Empty,
+                FirstCorrectAnswerTimestamp = futureTimestamp,
+                RoomName = roomName
+            };
 
             return newGameRound;
         }

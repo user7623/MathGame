@@ -43,21 +43,36 @@ namespace MathGame.BAL
             return _repository.ReadRoundsForRoom(roomName);
         }
 
+        public List<GameRound> ReadRoundsFromRoomAfterRound(string roomName, int roundNumber)
+        {
+            if (string.IsNullOrEmpty(roomName))
+            {
+                return null;
+            }
+            //TODO : maybe an aditional check for validity / special characters and similar
+            return _repository.ReadRoundsForRoomAfterRound(roomName, roundNumber);
+        }
+
         public void SaveAnswerForRound(AnswerDto answer)
         {
             try
             {
-                var gameRound = _repository.GetGameRoundById(answer.RoundNumber, answer.RoomName);
-
-                if (gameRound.FirstCorrectAnswerTimestamp > answer.Timestamp
-                    || string.IsNullOrEmpty(gameRound.FirstCorrectAnswerTimestamp.ToString()))
+                bool isValid = ValidateAnswer(answer);
+                if (isValid && answer.RoundNumber > 0)
                 {
-                    gameRound.FirstCorrectAnswerTimestamp = answer.Timestamp;
-                    gameRound.Username = answer.Username;
-                    _repository.UpdateGameRound(gameRound);
-                }
+                    var gameRound = _repository.GetGameRoundById(answer.RoundNumber, answer.RoomName);
+                    //TODO : check for nulls
 
-                _repository.SaveAnswerForRound(answer);
+                    if (gameRound.FirstCorrectAnswerTimestamp > answer.Timestamp
+                        || string.IsNullOrEmpty(gameRound.FirstCorrectAnswerTimestamp.ToString()))
+                    {
+                        gameRound.FirstCorrectAnswerTimestamp = answer.Timestamp;
+
+                        gameRound.Username = answer.Username;
+                        _repository.UpdateGameRound(gameRound);
+                    }
+                }
+                _repository.SaveAnswerForRound(answer);//TODO
             }
             catch (Exception ex)
             {
@@ -90,6 +105,19 @@ namespace MathGame.BAL
                 Log.Error("Exception in GameRoundsInformation -> UpdateGameRound");
                 Log.Error(ex.ToString());
             }
+        }
+
+        private bool ValidateAnswer(AnswerDto answer)
+        {
+            bool isValid = false;
+            if (answer.Timestamp.ToString() != null 
+                && !string.IsNullOrEmpty(answer.Answer) 
+                && !string.IsNullOrEmpty(answer.RoomName) 
+                && !string.IsNullOrEmpty(answer.Username))
+            {
+                isValid = true;
+            }
+            return isValid;
         }
     }
 }

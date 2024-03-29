@@ -127,5 +127,23 @@ namespace MathGame.Repositories
                 return null;
             }
         }
+
+        public List<GameRound> ReadRoundsForRoomAfterRound(string roomName, int roundNumber)
+        {
+            try
+            {
+                var rounds = _context.Instance.GameRounds.Where(r => r.RoomName.Equals(roomName) && r.RoundNumber > roundNumber)
+                                                         .OrderBy(r => r.RoundNumber)
+                                                         .ToList();
+
+                return rounds;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameRoundsInformation -> ReadRoundsForRoomAfterRound");
+                Log.Error(ex.ToString());
+                return null;
+            }
+        }
     }
 }

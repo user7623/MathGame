@@ -1,6 +1,9 @@
-﻿$(document).ready(function () {
+﻿var tableRoundsArray;
+
+$(document).ready(function () {
+    debugger;
     FetchGameData();
-    setInterval(InitializeNewRoundTimer, 5000);
+    setInterval(RefreshTable, 50000);
     //StartRoundTimer
     //GetLastUnansweredRound
     //BuildRowWithButtonsFromUnansweredRound
@@ -10,32 +13,28 @@
 //timer get initialized
 //newest round gets loaded with buttons for answering
 
-
 //TODO : last, need to redraw table
 
-function InitializeNewRoundTimer() {
-    //tuka treba da se refreshira databazata/ da se povika od novo za da se vcitaat 
-    console.log("initialize");
-    GetResultFromCurrentRound();
+//function InitializeNewRoundTimer() {
+//    //tuka treba da se refreshira databazata/ da se povika od novo za da se vcitaat 
+//    GetResultFromCurrentRound();
 
-    //get the newest round
-    const url = "https://localhost:44386/Game/GetNewestRound?roomName=" + "test room";//${ roomName };
-    $.ajax({
-        url: url,
-        method: 'GET',
-        success: function (data) {
-            AddRowForAnswering(data);
-            //table.row.add(rowData).draw(false);
-        },
-        error: function (xhr, status, error) {
-            console.error('There was a problem with the AJAX request:', error);
-        }
-    });
-}
+//    //get the newest round
+//    const url = "https://localhost:44386/Game/GetNewestRound?roomName=" + "test room";//${ roomName };
+//    $.ajax({
+//        url: url,
+//        method: 'GET',
+//        success: function (data) {
+//            AddRowForAnswering(data);
+//            //table.row.add(rowData).draw(false);
+//        },
+//        error: function (xhr, status, error) {
+//            alert("We are experiencing difficulties at the moment, please try again later");
+//        }
+//    });
+//}
 
 function GetResultFromCurrentRound() {
-    console.log("GetResultFromCurrentRound");
-    debugger;
     var table = $('#questionsTable').DataTable();
     var lastRowIndex = table.rows().count() - 1;
     var newCellValue = 'new value';//TODO
@@ -48,8 +47,10 @@ function FetchGameData() {
             url: "Game/GetQuestionsTable",
             type: "POST",
             dataSrc: function (response) {
-                debugger;
                 if (response != null && response != undefined) {
+                    debugger;
+                    //this is supposed to be an array with wich we build the table
+                    tableRoundsArray = response;
                     return response.map(function (item) {
                         return {
                             "roundNumber": item["roundNumber"],
@@ -76,20 +77,63 @@ function FetchGameData() {
         ],
         initComplete: function () {
             $("#loadingComponent").hide();
-            InitializeNewRoundTimer();
+            //InitializeNewRoundTimer();
         },
         columnDefs: [
             {
-                targets: '_all', // Apply to all columns
-                defaultContent: '' // Default content for missing columns
+                targets: '_all', 
+                defaultContent: '' 
             }
         ]
     });
 }
 
+function DrawTable(response) {
+    return response.map(function (item) {
+        return {
+            "roundNumber": item["roundNumber"],
+            "expression": item["expression"],
+            "yourAnswer": item["yourAnswer"],
+            "result": item["v"]
+        };
+    });
+}
+
+function RefreshTable() {
+    let roundNumber = GetLastRoundNumber();
+
+    $.ajax({
+        url: "Game/GetQuestionsTableAfterRound?roundNumber=" + roundNumber ,
+        type: "POST",
+        success: function (response) {
+            if (response != null && response != undefined) {
+                debugger;
+                response.forEach(function (newRound) {
+                    tableRoundsArray.push(newRound);
+                });
+                //tuka da se dopolni tableArray i da se redraw na tabelata
+            }
+        }
+    });
+
+    $('#questionsTable').DataTable().clear();
+    $('#questionsTable').DataTable().rows.add(tableRoundsArray);
+    $('#questionsTable').DataTable().draw();
+    AddRowForAnswering(tableRoundsArray[tableRoundsArray.length - 1]);
+}
+
+function GetLastRoundNumber() {
+    var table = $('#questionsTable').DataTable();
+    var lastRow = table.row(':last');
+    var rowData = lastRow.data();
+    return rowData["roundNumber"]
+}
+
 function AddRowForAnswering(data) {
-    var buttonsForAnsweringHtml = ` <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber + `, 'Yes')">Yes</button>
-                                    <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber + `, 'No')">No</button>`;
+    console.log("data", data);
+    debugger;
+    var buttonsForAnsweringHtml = ` <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber.toString() + `, 'Yes')">Yes</button>
+                                    <button class="answer-button" onclick="javascript: SubmitAnswer(` + data.roundNumber.toString() + `, 'No')">No</button>`;
 
     var table = $('#questionsTable').DataTable();
     var lastRowIndex = table.rows().count() - 1;
@@ -150,33 +194,24 @@ function SubmitAnswer(roundNumber, answer) {
 
     SetYourAnswerCellText(answer);
 
-    //TODO : round number is 0 here, fix
-
     var data = {
         Answer: answer,
         RoundNumber: roundNumber,
         Timestamp: Date.now(),
         RoomName: "test room",
     };
-    debugger;
-    //TODO : roomname is null
     $.ajax({
         type: "POST",
         url: "Game/SubmitAnswer",
         contentType: "application/json",
         data: JSON.stringify(data),
-        success: function (data, status) {
-            alert("Data: " + data + "\nStatus: " + status);
-        },
         error: function (xhr, status, error) {
-            alert("Error: " + error);
+            alert("We are experiencing difficulties at the moment, please try again later");
         }
     });
 }
 
 function SetYourAnswerCellText(answer) {
-    debugger;
-    //get the result from current round
     var table = $('#questionsTable').DataTable();
     var lastRowIndex = table.rows().count() - 1;
     var newCellValue = answer;

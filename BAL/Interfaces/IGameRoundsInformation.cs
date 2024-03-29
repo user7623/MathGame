@@ -10,6 +10,7 @@ namespace MathGame.BAL.Interfaces
         Task SaveGameRound(GameRound newRound);
         void UpdateGameRound(GameRound newRound);
         List<GameRound> ReadRoundsForRoom(string roomName);
+        List<GameRound> ReadRoundsFromRoomAfterRound(string roomName, int roundNumber);
         GameRound GetGameRoundById(int roundNumber, string roomName);
         void SaveAnswerForRound(AnswerDto answer);
         int GetLastRoundNumber(string roomName);

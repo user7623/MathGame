@@ -1,4 +1,5 @@
 ﻿using MathGame.Models;
+using MathGame.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MathGame.Controllers
@@ -16,20 +18,28 @@ namespace MathGame.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHubContext<OnlineUsersHub> _onlineUsersHubContext;
+        private readonly IActivePlayersService _activePlayersService;
 
-        public HomeController(ILogger<HomeController> logger, IHubContext<OnlineUsersHub> onlineUsersHubContext)
+        public HomeController(ILogger<HomeController> logger,
+            IHubContext<OnlineUsersHub> onlineUsersHubContext,
+            IActivePlayersService activePlayersService)
         {
             _logger = logger;
             _onlineUsersHubContext = onlineUsersHubContext;
+            _activePlayersService = activePlayersService;
         }
 
         public IActionResult Index()
         {
             var userToken = HttpContext.Session.GetString("token");
+            if (TempData["RoomIsFull"] != null)
+            {
+                var isFull = TempData["RoomIsFull"];
+                ViewData["RoomIsFull"] = isFull;
+            }
+            if (string.IsNullOrEmpty(userToken) || !UserHasValidToken(userToken)) return RedirectToAction("Login", "Home");
 
-            if(string.IsNullOrEmpty(userToken) || !UserHasValidToken(userToken)) return RedirectToAction("Login", "Home");
-
-            return View();      
+            return View();
         }
 
         public IActionResult Login()
@@ -38,16 +48,25 @@ namespace MathGame.Controllers
         }
 
         [HttpPost]
-        public IActionResult JoinGame(Player player)
+        public async Task<IActionResult> JoinGame(string roomName)
         {
             // Process the model data received from the form
             // Example: Save data to a database, perform business logic, etc.
 
-            HttpContext.Session.SetString("PlayerName", player.PlayerName);
-            HttpContext.Session.SetString("RoomName", "FirstRoomName");
+            //TODO : check if room has room
 
-            return RedirectToAction("Index", "Game");
-        }
+            var activeInRoom = await _activePlayersService.GetActivePlayersInRoom();
+
+            if (activeInRoom >= 4)
+            {
+                TempData["RoomIsFull"] = true;
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Game");
+            }
+        } 
 
         public IActionResult ActiveSessionsCount()
         {
