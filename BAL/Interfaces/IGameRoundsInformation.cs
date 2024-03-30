@@ -12,7 +12,7 @@ namespace MathGame.BAL.Interfaces
         List<GameRound> ReadRoundsForRoom(string roomName);
         List<GameRound> ReadRoundsFromRoomAfterRound(string roomName, int roundNumber);
         GameRound GetGameRoundById(int roundNumber, string roomName);
-        void SaveAnswerForRound(AnswerDto answer);
+        int SaveAnswerForRound(AnswerDto answer);
         int GetLastRoundNumber(string roomName);
         GameRound GetNewestRound(string roomName);
     }

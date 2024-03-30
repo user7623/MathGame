@@ -53,32 +53,49 @@ namespace MathGame.BAL
             return _repository.ReadRoundsForRoomAfterRound(roomName, roundNumber);
         }
 
-        public void SaveAnswerForRound(AnswerDto answer)
+        /// <summary>
+        /// Checks answer objecs validity, then checks if answer is correct
+        /// If first correct answer returns 1
+        /// If correct but not first retruns 0
+        /// If answer is wrong returns -1
+        /// </summary>
+        /// <param name="answer"></param>
+        /// <returns></returns>
+        public int SaveAnswerForRound(AnswerDto answer)
         {
             try
             {
                 bool isValid = ValidateAnswer(answer);
+                bool isCorrect = false;
                 if (isValid && answer.RoundNumber > 0)
                 {
                     var gameRound = _repository.GetGameRoundById(answer.RoundNumber, answer.RoomName);
-                    //TODO : check for nulls
 
-                    if (gameRound.FirstCorrectAnswerTimestamp > answer.Timestamp
+                    if(gameRound.IsCorrect && answer.Answer.ToLower().Equals("yes")
+                        || !gameRound.IsCorrect && answer.Answer.ToLower().Equals("no"))
+                    {
+                        isCorrect = true;
+                    }
+
+                    if ((gameRound.FirstCorrectAnswerTimestamp > answer.Timestamp
                         || string.IsNullOrEmpty(gameRound.FirstCorrectAnswerTimestamp.ToString()))
+                        && isCorrect)
                     {
                         gameRound.FirstCorrectAnswerTimestamp = answer.Timestamp;
 
                         gameRound.Username = answer.Username;
                         _repository.UpdateGameRound(gameRound);
+                        return 1;
                     }
+                    if (isCorrect) { return 0; }
                 }
-                _repository.SaveAnswerForRound(answer);//TODO
             }
             catch (Exception ex)
             {
                 Log.Error("Exception in GameRoundsInformation -> SaveAnswerForRound");
                 Log.Error(ex.ToString());
             }
+            return -1;
         }
 
         public async Task SaveGameRound(GameRound newRound)

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MathGame.Models
 {
@@ -14,6 +11,8 @@ namespace MathGame.Models
         public bool IsCorrect { get; set; }
         public long FirstCorrectAnswerTimestamp { get; set; }
         public string Username { get; set; }
+        [NotMapped]
+        public string Result { get; set; }
 
         public GameRound(int Id, string RoomName, int RoundNumber, string Expression, int FirstCorrectAnswerTimestamp, string Username)
         {
@@ -23,6 +22,7 @@ namespace MathGame.Models
             this.Expression = Expression;
             this.FirstCorrectAnswerTimestamp = FirstCorrectAnswerTimestamp;
             this.Username = Username;
+            this.Result = string.Empty;
         }
 
         public GameRound() { }

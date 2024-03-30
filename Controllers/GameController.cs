@@ -77,6 +77,13 @@ namespace MathGame.Controllers
                 var response = new List<GameRound>();
                 var roomName = "test room";//TODO read from session
                 response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
+                foreach(var round in response)
+                {
+                    if (string.IsNullOrEmpty(round.Result))
+                    {
+                        round.Result = string.Empty;
+                    }
+                }
                 return response;
             }
             catch (Exception ex)
@@ -96,7 +103,14 @@ namespace MathGame.Controllers
                 //TODO : get only the last five or so
                 var response = new List<GameRound>();
                 var roomName = "test room";//TODO read from session
-                response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
+                response = _gameRoundsInformation.ReadRoundsFromRoomAfterRound(roomName, roundNumber);
+                foreach (var round in response)
+                {
+                    if (string.IsNullOrEmpty(round.Result))
+                    {
+                        round.Result = string.Empty;
+                    }
+                }
                 return response;
             }
             catch (Exception ex)
@@ -107,26 +121,25 @@ namespace MathGame.Controllers
             }
         }
 
-
-
         [HttpPost]
         public IActionResult SubmitAnswer([FromBody] AnswerDto answer)
         {
+            int isFirst = 0;
             if (!string.IsNullOrEmpty(answer.Answer) && !string.IsNullOrEmpty(answer.RoomName))
             {
                 answer.Username = HttpContext.Session.GetString("PlayerName");//TODO : is this needed
                 try
                 {
-                    _gameRoundsInformation.SaveAnswerForRound(answer);
+                    isFirst = _gameRoundsInformation.SaveAnswerForRound(answer);
                 }
                 catch
                 {
-                    return BadRequest();
+                    return BadRequest(isFirst);
                 }
-                return Ok();
+                return Ok(isFirst);
             }
 
-            return BadRequest();
+            return BadRequest(isFirst);
         }
     }
 }
