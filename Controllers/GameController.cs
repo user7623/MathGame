@@ -2,33 +2,27 @@
 using MathGame.Dtos;
 using MathGame.MathExpressions;
 using MathGame.Models;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineUsers;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System;
 using Serilog;
-using Microsoft.AspNetCore.Authorization;
 
 namespace MathGame.Controllers
 {
     public class GameController : Controller
     {
         private readonly IGameRoundsInformation _gameRoundsInformation;
-        private readonly IHubContext<OnlineUsersHub> _onlineUsersHubContext;
-        private bool isGeneratorActive = false;
         MathExpressionsGenerator generator = new MathExpressionsGenerator();
 
-        public GameController(IGameRoundsInformation gameRoundsInformation, IHubContext<OnlineUsersHub> onlineUsersHubContext)
+        public GameController(IGameRoundsInformation gameRoundsInformation)
         {
             _gameRoundsInformation = gameRoundsInformation;
-            _onlineUsersHubContext = onlineUsersHubContext;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View();
         }
@@ -55,9 +49,9 @@ namespace MathGame.Controllers
         [HttpGet]
         public async Task<IActionResult> GenerateGameRound()
         {
-            var roomName = "test room";
+            var roomName = HttpContext.Session.GetString("RoomName");
             var lastRoundNumber = _gameRoundsInformation.GetLastRoundNumber(roomName);
-            var newRound = generator.GenerateMathExpression(lastRoundNumber, roomName);//read dynamic
+            var newRound = generator.GenerateMathExpression(lastRoundNumber, roomName);
             await _gameRoundsInformation.SaveGameRound(newRound);
             return Ok();
         }
@@ -75,7 +69,7 @@ namespace MathGame.Controllers
             {
                 //TODO : get only the last five or so
                 var response = new List<GameRound>();
-                var roomName = "test room";//TODO read from session
+                var roomName = HttpContext.Session.GetString("RoomName");
                 response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
                 foreach(var round in response)
                 {
@@ -94,15 +88,13 @@ namespace MathGame.Controllers
             }
         }
 
-        //GetQuestionsTableAfterRound
         [HttpPost]
         public List<GameRound> GetQuestionsTableAfterRound(int roundNumber)
         {
             try
             {
-                //TODO : get only the last five or so
                 var response = new List<GameRound>();
-                var roomName = "test room";//TODO read from session
+                var roomName = HttpContext.Session.GetString("RoomName");
                 response = _gameRoundsInformation.ReadRoundsFromRoomAfterRound(roomName, roundNumber);
                 foreach (var round in response)
                 {
@@ -127,7 +119,7 @@ namespace MathGame.Controllers
             int isFirst = 0;
             if (!string.IsNullOrEmpty(answer.Answer) && !string.IsNullOrEmpty(answer.RoomName))
             {
-                answer.Username = HttpContext.Session.GetString("PlayerName");//TODO : is this needed
+                answer.Username = HttpContext.Session.GetString("PlayerName");
                 try
                 {
                     isFirst = _gameRoundsInformation.SaveAnswerForRound(answer);

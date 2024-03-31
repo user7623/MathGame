@@ -5,8 +5,7 @@
     @if (ViewData["RoomIsFull"] != null && (bool)ViewData["RoomIsFull"])
     {
         <script>
-            alert("The room is full!");
-            console.log("Room is ful gad dam et");
+            alert("The room is full!", @Model);
         </script>
     }
 }
@@ -14,17 +13,10 @@
 <div class="text-center">
     <h1 class="display-4">Welcome to the quick math game Lobby</h1>
     @*do i need player name?*@
-    @*TODO : remove class and inputs if not used*@
 
     <form asp-controller="Home" asp-action="JoinGame" method="post">
         <label asp-for="PlayerName">Join blue room</label>
         <input type="hidden" name="RoomName" value="blue room" />
-        @*<input asp-for="PlayerName" type="text" />*@
-
-        <!-- Include hidden inputs for each property of the model you want to send -->
-        @*TODO: delete if not used*@
-        @*<input type="hidden" asp-for="Score" />*@
-        <!-- Add additional hidden inputs for other properties as needed -->
         <button type="submit" class="btn btn-primary">Join game</button>
     </form>
 
@@ -34,10 +26,3 @@
         <button type="submit" class="btn btn-primary">Join game</button>
     </form>
 </div>
-
-@if (ViewData["RoomIsFull"] != null && (bool)ViewData["RoomIsFull"])
-{
-    <script>
-        alert("The room is full!");
-    </script>
-}

@@ -15,6 +15,11 @@ using Microsoft.AspNetCore.Identity;
 using MathGame.Controllers;
 using MathGame.Services.Interfaces;
 using MathGame.Services;
+using MathGame.Token;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System;
 
 namespace MathGame
 {
@@ -31,11 +36,17 @@ namespace MathGame
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddSession();
+            //services.AddSession();
+            services.AddSession(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
             services.AddMemoryCache();
             services.AddSignalR();
 
             services.AddTransient<IContext, Context>();
+            services.AddScoped<IJWTGenerator, JWTGenerator>();
 
             services.AddScoped<IActivePlayersService, ActivePlayersService>();
             services.AddHttpClient<ActivePlayersService>();
@@ -61,6 +72,41 @@ namespace MathGame
 
                     opt.User.RequireUniqueEmail = true;
                 }).AddEntityFrameworkStores<MathGameDbContext>();
+
+            services.AddAuthentication(cfg =>
+            {
+                cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Token:Key"])),
+                    ValidIssuer = Configuration["Token:Issuer"],
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    ValidateIssuer = true,
+                    ValidateAudience = false,
+                };
+            });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(options =>
+            //    {
+            //        options.TokenValidationParameters = new TokenValidationParameters
+            //        {
+            //            ValidateIssuer = true,
+            //            ValidateAudience = true,
+            //            ValidateLifetime = true,
+            //            ValidateIssuerSigningKey = true,
+            //            ValidIssuer = Configuration["Jwt:Issuer"],
+            //            ValidAudience = Configuration["Jwt:Audience"],
+            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+            //        };
+            //    });
+
+            services.AddAuthorization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

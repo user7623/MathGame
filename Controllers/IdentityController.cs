@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using MathGame.Models;
+using MathGame.Token;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,17 +19,20 @@ namespace MathGame.Controllers
 		private readonly SignInManager<IdentityUser> _signInManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
 		private readonly IConfiguration _config;
+		private readonly IJWTGenerator _jwtToken;
 
 		public IdentityController(
 			UserManager<IdentityUser> userManager,
 			 SignInManager<IdentityUser> signInManager,
 			  RoleManager<IdentityRole> roleManager,
-			  IConfiguration config)
+			  IConfiguration config,
+			  IJWTGenerator jWTGenerator)
 		{
 			_roleManager = roleManager;
 			_config = config;
 			_signInManager = signInManager;
 			_userManager = userManager;
+			_jwtToken = jWTGenerator;
 		}
 
 		[HttpPost("login")]
@@ -47,8 +53,21 @@ namespace MathGame.Controllers
 				return BadRequest();
 			}
 
-			HttpContext.Session.SetString("token", "token");
+			IList<Claim> claims = await _userManager.GetClaimsAsync(userFromDb);
+
+			var token = _jwtToken.GenerateToken(userFromDb, claims);
+
+			HttpContext.Session.SetString("token", token);
 			HttpContext.Session.SetString("PlayerName", userFromDb.UserName);
+			HttpContext.Session.SetString("Username", userFromDb.UserName);
+			HttpContext.Session.SetString("Email", userFromDb.Email);
+
+			//TODO : are these needed?
+			Response.Cookies.Append("token", token);
+			Response.Cookies.Append("PlayerName", userFromDb.UserName);
+			Response.Cookies.Append("Username", userFromDb.UserName);
+			Response.Cookies.Append("Email", userFromDb.Email);
+
 			return RedirectToAction("Index", "Home");
         }
 

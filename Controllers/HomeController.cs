@@ -37,7 +37,10 @@ namespace MathGame.Controllers
                 var isFull = TempData["RoomIsFull"];
                 ViewData["RoomIsFull"] = isFull;
             }
-            if (string.IsNullOrEmpty(userToken) || !UserHasValidToken(userToken)) return RedirectToAction("Login", "Home");
+            if (string.IsNullOrEmpty(userToken))
+            {
+                return RedirectToAction("Login", "Home");
+            }
 
             return View();
         }
@@ -50,13 +53,8 @@ namespace MathGame.Controllers
         [HttpPost]
         public async Task<IActionResult> JoinGame(string roomName)
         {
-            // Process the model data received from the form
-            // Example: Save data to a database, perform business logic, etc.
-
-            //TODO : check if room has room
-
             var activeInRoom = await _activePlayersService.GetActivePlayersInRoom();
-
+            HttpContext.Session.SetString("RoomName", roomName);
             if (activeInRoom >= 4)
             {
                 TempData["RoomIsFull"] = true;
@@ -88,16 +86,6 @@ namespace MathGame.Controllers
             //await _onlineUsersHubContext.Clients.All.SendAsync("UpdateOnlineUsers", onlineUsersCount);
 
             return Ok(onlineUsersCount);
-        }
-
-        private bool UserHasValidToken(string token)
-        {
-            //For simplicity and in the interest of time im not implementing actial tokes in this case
-            if (token.Equals("token"))
-            {
-                return true;
-            }
-            else return false;
         }
     }
 }
