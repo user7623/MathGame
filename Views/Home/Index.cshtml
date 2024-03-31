@@ -12,17 +12,10 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome to the quick math game Lobby</h1>
-    @*do i need player name?*@
 
     <form asp-controller="Home" asp-action="JoinGame" method="post">
         <label asp-for="PlayerName">Join test room</label>
         <input type="hidden" name="RoomName" value="test room" />
-        <button type="submit" class="btn btn-primary">Join game</button>
-    </form>
-
-    <form asp-controller="Home" asp-action="JoinGame" method="post">
-        <label asp-for="PlayerName">Join green room</label>
-        <input type="hidden" name="RoomName" value="green room" />
         <button type="submit" class="btn btn-primary">Join game</button>
     </form>
 </div>
