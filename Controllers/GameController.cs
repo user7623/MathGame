@@ -49,9 +49,9 @@ namespace MathGame.Controllers
         [HttpGet]
         public async Task<IActionResult> GenerateGameRound()
         {
-            var roomName = HttpContext.Session.GetString("RoomName");
-            var lastRoundNumber = _gameRoundsInformation.GetLastRoundNumber(roomName);
-            var newRound = generator.GenerateMathExpression(lastRoundNumber, roomName);
+            //var roomName = HttpContext.Session.GetString("RoomName");
+            var lastRoundNumber = _gameRoundsInformation.GetLastRoundNumber("test room");
+            var newRound = generator.GenerateMathExpression(lastRoundNumber, "test room");
             await _gameRoundsInformation.SaveGameRound(newRound);
             return Ok();
         }

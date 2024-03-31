@@ -45,8 +45,7 @@ namespace MathGame.MathExpressions
 
         private void GenerateExpression(object state)
         {
-
-            _generator.GenerateMathExpression(roundNumber, roomName);
+            _generator.GenerateMathExpression(roundNumber, "test room");
         }
     }
 }
