@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MathGame.Dtos
+﻿namespace MathGame.Dtos
 {
     public class AnswerDto
     {

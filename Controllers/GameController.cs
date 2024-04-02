@@ -49,10 +49,12 @@ namespace MathGame.Controllers
         [HttpGet]
         public async Task<IActionResult> GenerateGameRound()
         {
+            //If more rooms are implementet for scaling in future, this will make it easier
             //var roomName = HttpContext.Session.GetString("RoomName");
             var lastRoundNumber = _gameRoundsInformation.GetLastRoundNumber("test room");
             var newRound = generator.GenerateMathExpression(lastRoundNumber, "test room");
             await _gameRoundsInformation.SaveGameRound(newRound);
+
             return Ok();
         }
 
@@ -69,9 +71,61 @@ namespace MathGame.Controllers
             {
                 //TODO : get only the last five or so
                 var response = new List<GameRound>();
-                var roomName = HttpContext.Session.GetString("RoomName");
+                var roomName = "test room";//HttpContext.Session.GetString("RoomName");
                 response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
                 foreach(var round in response)
+                {
+                    if (string.IsNullOrEmpty(round.Result))
+                    {
+                        round.Result = string.Empty;
+                    }
+                }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameController -> GetQuestionsTable");
+                Log.Error(ex.ToString());
+                return null;
+            }
+        }
+
+        [HttpPost]
+        public List<GameRound> GetQuestionsTableTestForReact()
+        {
+            try
+            {
+                //TODO : get only the last five or so
+                var response = new List<GameRound>();
+                //var roomName = HttpContext.Session.GetString("RoomName");
+                var roomName = "test room";
+                response = _gameRoundsInformation.ReadRoundsForRoom(roomName);
+                foreach (var round in response)
+                {
+                    if (string.IsNullOrEmpty(round.Result))
+                    {
+                        round.Result = string.Empty;
+                    }
+                }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in GameController -> GetQuestionsTable");
+                Log.Error(ex.ToString());
+                return null;
+            }
+        }
+
+        [HttpPost]
+        public List<GameRound> GetQuestionsTableAfterRoundTestForReact(int roundNumber)
+        {
+            try
+            {
+                var response = new List<GameRound>();
+                var roomName = "test room";//HttpContext.Session.GetString("RoomName");
+                response = _gameRoundsInformation.ReadRoundsFromRoomAfterRound(roomName, roundNumber);
+                foreach (var round in response)
                 {
                     if (string.IsNullOrEmpty(round.Result))
                     {
@@ -94,7 +148,7 @@ namespace MathGame.Controllers
             try
             {
                 var response = new List<GameRound>();
-                var roomName = HttpContext.Session.GetString("RoomName");
+                var roomName = "test room";//HttpContext.Session.GetString("RoomName");
                 response = _gameRoundsInformation.ReadRoundsFromRoomAfterRound(roomName, roundNumber);
                 foreach (var round in response)
                 {

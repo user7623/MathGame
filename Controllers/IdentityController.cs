@@ -6,7 +6,6 @@ using MathGame.Token;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace MathGame.Controllers
 {
@@ -17,19 +16,13 @@ namespace MathGame.Controllers
 
 		private readonly UserManager<IdentityUser> _userManager;
 		private readonly SignInManager<IdentityUser> _signInManager;
-		private readonly RoleManager<IdentityRole> _roleManager;
-		private readonly IConfiguration _config;
 		private readonly IJWTGenerator _jwtToken;
 
 		public IdentityController(
 			UserManager<IdentityUser> userManager,
 			 SignInManager<IdentityUser> signInManager,
-			  RoleManager<IdentityRole> roleManager,
-			  IConfiguration config,
 			  IJWTGenerator jWTGenerator)
 		{
-			_roleManager = roleManager;
-			_config = config;
 			_signInManager = signInManager;
 			_userManager = userManager;
 			_jwtToken = jWTGenerator;
@@ -61,12 +54,6 @@ namespace MathGame.Controllers
 			HttpContext.Session.SetString("PlayerName", userFromDb.UserName);
 			HttpContext.Session.SetString("Username", userFromDb.UserName);
 			HttpContext.Session.SetString("Email", userFromDb.Email);
-
-			//TODO : are these needed?
-			Response.Cookies.Append("token", token);
-			Response.Cookies.Append("PlayerName", userFromDb.UserName);
-			Response.Cookies.Append("Username", userFromDb.UserName);
-			Response.Cookies.Append("Email", userFromDb.Email);
 
 			return RedirectToAction("Index", "Home");
         }

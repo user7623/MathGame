@@ -5,27 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using OnlineUsers;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MathGame.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IHubContext<OnlineUsersHub> _onlineUsersHubContext;
         private readonly IActivePlayersService _activePlayersService;
 
-        public HomeController(ILogger<HomeController> logger,
-            IHubContext<OnlineUsersHub> onlineUsersHubContext,
-            IActivePlayersService activePlayersService)
+        public HomeController(IActivePlayersService activePlayersService)
         {
-            _logger = logger;
-            _onlineUsersHubContext = onlineUsersHubContext;
             _activePlayersService = activePlayersService;
         }
 
@@ -81,10 +72,6 @@ namespace MathGame.Controllers
         public IActionResult GetActive()
         {
             int onlineUsersCount = OnlineUsersHub.GetOnlineUsersCount();
-            //TODO : remove comment
-            // Alternatively, you can use the hub context to call methods on the hub
-            //await _onlineUsersHubContext.Clients.All.SendAsync("UpdateOnlineUsers", onlineUsersCount);
-
             return Ok(onlineUsersCount);
         }
     }

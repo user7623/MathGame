@@ -1,5 +1,4 @@
-﻿using MathGame.MathExpressions;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -10,7 +9,6 @@ namespace OnlineUsers
     public class OnlineUsersHub : Hub
     {
         private static readonly ConcurrentDictionary<string, bool> _onlineUsers = new ConcurrentDictionary<string, bool>();
-        private bool isGeneratorActive = false;
 
         public override async Task OnConnectedAsync()
         {
